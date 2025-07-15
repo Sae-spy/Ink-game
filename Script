@@ -44,8 +44,6 @@ local Window = Rayfield:CreateWindow({
 })
 
 local MainTab = Window:CreateTab("Main", 4483362458)
-MainTab:CreateSection("Exploits")
-MainTab:CreateSection("Player")
 
 -- Exploits
 MainTab:CreateToggle({
