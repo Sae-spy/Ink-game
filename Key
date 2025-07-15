@@ -1,4 +1,4 @@
--- Souls Hub Key System GUI (Custom, not Rayfield)
+-- Souls Hub Key System GUI
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
