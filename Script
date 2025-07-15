@@ -1,0 +1,180 @@
+-- Souls Hub - Rayfield Version (No Key System) by Sae
+
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local lp = Players.LocalPlayer
+
+-- Feature toggles and settings
+local tugSpam = false
+local noclipEnabled = false
+local walkSpeedVal = 16
+local tpWalkSpeedVal = 0.3
+local jumpPowerVal = 50
+local fovVal = 70
+local tpwalking = false
+local InfiniteJumpEnabled = false
+
+-- Track character and humanoid
+local char = lp.Character or lp.CharacterAdded:Wait()
+local hum = char:FindFirstChildWhichIsA("Humanoid")
+lp.CharacterAdded:Connect(function(newChar)
+    char = newChar
+    hum = char:WaitForChild("Humanoid")
+end)
+
+-- Create Rayfield Window
+local Window = Rayfield:CreateWindow({
+    Name = "Souls Hub",
+    LoadingTitle = "Souls Hub",
+    LoadingSubtitle = "by Sae",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "SoulsHub",
+        FileName = "SoulsHubConfig"
+    },
+    Discord = {
+        Enabled = true,
+        Invite = "ede3wHEH9m"  -- discord.gg/ede3wHEH9m
+    },
+    KeySystem = false
+})
+
+local MainTab = Window:CreateTab("Main", 4483362458)
+MainTab:CreateSection("Exploits")
+MainTab:CreateSection("Player")
+
+-- Exploits
+MainTab:CreateToggle({
+    Name = "Auto Tug of War",
+    CurrentValue = false,
+    SectionParent = MainTab:CreateSection("Exploits"),
+    Callback = function(v) tugSpam = v end
+})
+
+MainTab:CreateButton({
+    Name = "Finish Red Light, Green Light",
+    SectionParent = MainTab:CreateSection("Exploits"),
+    Callback = function()
+        local hrp = char:WaitForChild("HumanoidRootPart")
+        hrp.CFrame = CFrame.new(-43.84, 1025.06, 136.77)
+    end
+})
+
+MainTab:CreateButton({
+    Name = "Finish Glass Game",
+    SectionParent = MainTab:CreateSection("Exploits"),
+    Callback = function()
+        local hrp = char:WaitForChild("HumanoidRootPart")
+        hrp.CFrame = CFrame.new(-212.0, 521.0, -1534.9)
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "Noclip",
+    CurrentValue = false,
+    SectionParent = MainTab:CreateSection("Exploits"),
+    Callback = function(v) noclipEnabled = v end
+})
+
+-- Player
+MainTab:CreateSlider({
+    Name = "WalkSpeed",
+    Range = {16, 250},
+    Increment = 1,
+    CurrentValue = walkSpeedVal,
+    SectionParent = MainTab:CreateSection("Player"),
+    Callback = function(v) walkSpeedVal = v end
+})
+
+MainTab:CreateSlider({
+    Name = "TpWalkSpeed",
+    Range = {0.1, 2},
+    Increment = 0.1,
+    CurrentValue = tpWalkSpeedVal,
+    SectionParent = MainTab:CreateSection("Player"),
+    Callback = function(v) tpWalkSpeedVal = v end
+})
+
+MainTab:CreateSlider({
+    Name = "JumpPower",
+    Range = {50, 300},
+    Increment = 1,
+    CurrentValue = jumpPowerVal,
+    SectionParent = MainTab:CreateSection("Player"),
+    Callback = function(v) jumpPowerVal = v end
+})
+
+MainTab:CreateSlider({
+    Name = "FOV",
+    Range = {70, 120},
+    Increment = 1,
+    CurrentValue = fovVal,
+    SectionParent = MainTab:CreateSection("Player"),
+    Callback = function(v) fovVal = v end
+})
+
+MainTab:CreateToggle({
+    Name = "Enable TpWalk",
+    CurrentValue = false,
+    SectionParent = MainTab:CreateSection("Player"),
+    Callback = function(v) tpwalking = v end
+})
+
+MainTab:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false,
+    SectionParent = MainTab:CreateSection("Player"),
+    Callback = function(v) InfiniteJumpEnabled = v end
+})
+
+-- Infinite Jump handler
+UserInputService.JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        local char = lp.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- Update loop
+RunService.Heartbeat:Connect(function()
+    if char and hum then
+        hum.WalkSpeed = walkSpeedVal
+        hum.JumpPower = jumpPowerVal
+
+        if tpwalking and hum.MoveDirection.Magnitude > 0 then
+            hum.PlatformStand = false
+            char:TranslateBy(hum.MoveDirection * tpWalkSpeedVal)
+        end
+
+        if noclipEnabled then
+            for _, part in ipairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end
+
+    workspace.CurrentCamera.FieldOfView = fovVal
+end)
+
+-- Auto Tug spam loop
+task.spawn(function()
+    while true do
+        if tugSpam then
+            pcall(function()
+                ReplicatedStorage:WaitForChild("Remotes", 1e9)
+                    :WaitForChild("TemporaryReachedBindable", 1e9)
+                    :FireServer({QTEGood = true})
+            end)
+        end
+        task.wait(0.1)
+    end
+end)
